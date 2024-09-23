@@ -1,3 +1,10 @@
+@import url("https://fonts.googleapis.com/css2?family=Faustina:ital,wght@0,300..800;1,300..800&display=swap");
+* {
+  box-sizing: border-box;
+  font-family: "Faustina", serif;
+  font-weight: 400;
+}
+
 body {
   color: #222;
 }
@@ -7,14 +14,16 @@ img {
 
 main {
   padding: 10px;
-  max-width: 1600px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
 header {
   display: flex;
   justify-content: space-between;
+  margin-top: 10px;
   margin-bottom: 50px;
+  align-items: center;
 }
 header a {
   text-decoration: none;
@@ -22,21 +31,100 @@ header a {
 }
 header a.logo {
   font-weight: bold;
+  font-size: 1.5 rem;
 }
 a.logo img {
   height: 60px;
-  width: 60dvhpx;
+  width: 60px;
 }
 header nav {
   display: flex;
   gap: 15px;
+  font-weight: bold;
+  color: blue;
 }
 .post {
   display: grid;
   grid-template-columns: 0.9fr 1.1fr;
   gap: 20px;
+  margin-bottom: 30px;
 }
-.post .texts h2 {
+.post.texts h2 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
+}
+.post p.info {
+  margin: 6px 0;
+  color: #888;
+  font-size: 0.7rem;
+  font-weight: bold;
+  display: flex;
+  gap: 10px;
+}
+.post p.info a.author {
+  color: #333;
+}
+.post p.summary {
+  margin: 10dvhpx 0;
+  line-height: 1.4rem;
+}
+form.login,
+form.register {
+  max-width: 400px;
+  margin: 0 auto;
+}
+input {
+  display: block;
+  margin-bottom: 5px;
+  padding: 5px 7px;
+  height: 40px;
+  width: 100%;
+  border: 0;
+  background-color: #fff;
+  border-radius: 5px;
+  border-bottom: 2px solid #ddd;
+  margin-bottom: 10px;
+}
+form.login h1,
+form.register h1 {
+  text-align: center;
+  height: 70px;
+  padding: 5px;
+  width: 100%;
+  background-color: blueviolet;
+  color: #fff;
+  border-radius: 15px 15px 0 0;
+  font-weight: bold;
+}
+button {
+  width: 100%;
+  display: block;
+  background-color: #555;
+  color: #fff;
+  border: 0;
+  border-radius: 5px;
+  padding: 7px 0;
+  height: 40px;
+  font-size: medium;
+}
+button:hover {
+  background-color: #fff;
+  color: #555;
+  border: 2px solid #555;
+}
+form.register .otherwise,
+form.login .otherwise {
+  text-align: center;
+  height: 70px;
+  padding: 5px;
+  width: 100%;
+  background-color: blueviolet;
+  color: #fff;
+  border-radius: 0 0 15px 15px;
+  margin-top: 15px;
+  font-size: medium;
+}
+form.register a,
+form.login a {
+  color: #fff;
 }
