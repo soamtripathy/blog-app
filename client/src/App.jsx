@@ -1,13 +1,13 @@
 import "./App.css";
 import { Route, Routes } from "react-router-dom";
-import Layout from "./components/Layout";
-import IndexPage from "./pages/IndexPage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
+import Layout from "./components/Layout.jsx";
+import IndexPage from "./pages/IndexPage.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import RegisterPage from "./pages/RegisterPage.jsx";
 import { UserContextProvider } from "./UserContext.jsx";
 import CreatePost from "./pages/CreatePost.jsx";
+
 function App() {
-  
   return (
     <UserContextProvider>
       <Routes>
@@ -15,7 +15,7 @@ function App() {
           <Route index element={<IndexPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path = '/create' element = {<CreatePost/>} />
+          <Route path="/create" element={<CreatePost />} />
         </Route>
       </Routes>
     </UserContextProvider>

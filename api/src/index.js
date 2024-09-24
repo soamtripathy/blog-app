@@ -107,6 +107,16 @@ app.post("/post", uploadMiddleware.single("file"), async (req, res) => {
   });
 });
 
+app.get("/post", async (req, res) => {
+  try {
+    const posts = await Post.find();
+    res.json(posts);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch posts" });
+  }
+});
+
 app.listen(process.env.PORT || 8000, () => {
   console.log(`Server is running on ${process.env.PORT || 8000}`);
 });
