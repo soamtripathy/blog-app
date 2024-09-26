@@ -1,15 +1,19 @@
 import { format } from "date-fns";
+import { Link } from "react-router-dom";
 
-const Post = ({ title, summary, cover, content, createdAt, author }) => {
+const Post = ({ _id, title, summary, cover, content, createdAt, author }) => {
+  console.log(author); // Debugging line to check the author prop
   return (
     <div className="post">
-      <div className="image">
-        <img src={cover} alt={title} />
-      </div>
+      <Link to={`/post/${_id}`}>
+        <img src={"http://localhost:8000/" + cover} alt={title} />
+      </Link>
       <div className="texts">
-        <h2>{title}</h2>
+        <Link to={`/post/${_id}`}>
+          <h2>{title}</h2>
+        </Link>
         <p className="info">
-          <a className="author">{author}</a>
+          <a className="author">{author && author.username}</a>
           <time>{format(new Date(createdAt), "dd-MM-yyyy, HH:mm")}</time>
         </p>
         <p className="summary">{summary}</p>

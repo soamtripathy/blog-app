@@ -9,6 +9,8 @@ import cookieParser from "cookie-parser";
 import multer from "multer";
 import fs from "fs";
 import { Post } from "../models/post.model.js";
+import path from "path";
+
 const app = express();
 
 const uploadMiddleware = multer({ dest: "uploads/" });
@@ -24,6 +26,8 @@ app.use(
 );
 
 app.use(cookieParser());
+
+app.use("/uploads", express.static("uploads"));
 
 mongoose
   .connect(process.env.MONGODB_URI)
@@ -48,17 +52,13 @@ app.post("/register", async (req, res) => {
     res.status(500).json({ error: "Failed to create user" });
   }
 });
+
 app.post("/login", async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    const userDoc = await User.findOne({ username });
-    if (!userDoc) {
-      return res.status(400).json({ error: "User not found" });
-    }
-    const passOk = bcrypt.compareSync(password, userDoc.password);
-    if (!passOk) {
-      return res.status(400).json("wrong credentials");
-    }
+  const { username, password } = req.body;
+  const userDoc = await User.findOne({ username });
+  const passOk = bcrypt.compareSync(password, userDoc.password);
+  if (passOk) {
+    // logged in
     jwt.sign(
       { username, id: userDoc._id },
       process.env.ACCESS_TOKEN_SECRET,
@@ -71,9 +71,8 @@ app.post("/login", async (req, res) => {
         });
       }
     );
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to login" });
+  } else {
+    res.status(400).json("wrong credentials");
   }
 });
 
@@ -92,29 +91,56 @@ app.post("/logout", (req, res) => {
 });
 
 app.post("/post", uploadMiddleware.single("file"), async (req, res) => {
-  const { originalname, path } = req.file;
-  const parts = originalname.split(".");
-  const ext = parts[parts.length - 1];
-  const newPath = path + "." + ext;
-  fs.renameSync(path, newPath);
-  res.json({ files: req.file });
-  const { title, summary, content } = req.body;
-  const postDoc = await Post.create({
-    title,
-    summary,
-    content,
-    cover: newPath,
-  });
+  try {
+    const { originalname, path } = req.file;
+    const parts = originalname.split(".");
+    const ext = parts[parts.length - 1];
+    const newPath = path + "." + ext;
+    fs.renameSync(path, newPath);
+
+    const { token } = req.cookies;
+    jwt.verify(
+      token,
+      process.env.ACCESS_TOKEN_SECRET,
+      {},
+      async (err, info) => {
+        if (err) throw err;
+        const { title, summary, content } = req.body;
+        const postDoc = await Post.create({
+          title,
+          summary,
+          content,
+          cover: newPath,
+          author: info.id,
+        });
+
+        res.json(postDoc);
+      }
+    );
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to create post" });
+  }
 });
 
 app.get("/post", async (req, res) => {
   try {
-    const posts = await Post.find();
+    const posts = await Post.find()
+      .populate("author", ["username"])
+      .sort({ createdAt: -1 })
+      .limit(20);
     res.json(posts);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch posts" });
   }
+});
+
+app.get("/post/:id", async (req, res) => {
+  const { id } = req.params;
+  const postDoc = await Post.findById(id).populate("author", ["username"]);
+  console.log(postDoc)
+  res.json(postDoc);
 });
 
 app.listen(process.env.PORT || 8000, () => {
