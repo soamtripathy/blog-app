@@ -1,5 +1,6 @@
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
+import parse from "html-react-parser";
 
 const Post = ({ _id, title, summary, cover, content, createdAt, author }) => {
   console.log(author); // Debugging line to check the author prop
@@ -17,6 +18,7 @@ const Post = ({ _id, title, summary, cover, content, createdAt, author }) => {
           <time>{format(new Date(createdAt), "dd-MM-yyyy, HH:mm")}</time>
         </p>
         <p className="summary">{summary}</p>
+        <p className="content">{parse(content)}</p>
       </div>
     </div>
   );

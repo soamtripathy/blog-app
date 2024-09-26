@@ -1,9 +1,9 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import logoImage from "../../public/morsamiya.jpg";
 import { Link } from "react-router-dom";
 import { UserContext } from "../UserContext.jsx";
 const Header = () => {
-  const {setUserInfo, userInfo} = useContext(UserContext)
+  const { setUserInfo, userInfo } = useContext(UserContext);
   useEffect(() => {
     fetch("http://localhost:8000/profile", {
       credentials: "include",
@@ -22,7 +22,7 @@ const Header = () => {
     setUserInfo(null);
   }
 
-  const username = userInfo?.username
+  const username = userInfo?.username;
   return (
     <>
       <header>
@@ -32,6 +32,7 @@ const Header = () => {
         <nav>
           {username && (
             <>
+              <span>Hello, {username}</span>
               <Link to="/create">Create new post</Link>
               <a onClick={logout} href="#">
                 Logout ({username})
