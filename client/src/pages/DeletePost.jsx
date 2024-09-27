@@ -5,7 +5,7 @@ const DeletePost = () => {
   const params = useParams();
 
   const id = params.id;
-  console.log("Post ID:", id); // Log the ID to verify it
+
 
   async function deletePost() {
     try {
@@ -30,7 +30,7 @@ const DeletePost = () => {
   }
 
   return (
-    <div>
+    <div className="delete">
       <button onClick={deletePost}>Delete Post</button>
     </div>
   );

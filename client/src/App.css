@@ -204,3 +204,6 @@ a.edit-button {
 a svg {
   height: 20px;
 }
+.delete button{
+  margin-top: 20px;
+}

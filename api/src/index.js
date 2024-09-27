@@ -8,7 +8,9 @@ import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import multer from "multer";
 import fs from "fs";
+import { v2 as cloudinary } from "cloudinary";
 import { Post } from "../models/post.model.js";
+
 import path from "path";
 
 const app = express();
@@ -16,6 +18,12 @@ const app = express();
 const uploadMiddleware = multer({ dest: "uploads/" });
 
 dotenv.config({ path: "./.env" });
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 
@@ -33,6 +41,10 @@ mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
+
+app.get("/", (req, res)=> {
+  res.json("Hello")
+})
 
 app.post("/register", async (req, res) => {
   try {
@@ -89,14 +101,38 @@ app.get("/profile", async (req, res) => {
 app.post("/logout", (req, res) => {
   res.cookie("token", "").json("ok");
 });
+const uploadOnCloudinary = async (localFilePath) => {
+  try {
+    if (!localFilePath) return null;
+    const response = await cloudinary.uploader.upload(localFilePath, {
+      resource_type: "auto",
+    });
+    fs.unlinkSync(localFilePath);
+    return response;
+  } catch (error) {
+    fs.unlinkSync(localFilePath);
+    return null;
+  }
+};
+
+const deleteFromCloudinary = async (publicId) => {
+  try {
+    if (!publicId) return null;
+    const response = await cloudinary.uploader.destroy(publicId);
+    return response;
+  } catch (error) {
+    return null;
+  }
+};
 
 app.post("/post", uploadMiddleware.single("file"), async (req, res) => {
   try {
-    const { originalname, path } = req.file;
-    const parts = originalname.split(".");
-    const ext = parts[parts.length - 1];
-    const newPath = path + "." + ext;
-    fs.renameSync(path, newPath);
+    const { path } = req.file;
+    const result = await uploadOnCloudinary(path);
+
+    if (!result) {
+      return res.status(400).json({ error: "Failed to upload image" });
+    }
 
     const { token } = req.cookies;
     jwt.verify(
@@ -110,7 +146,7 @@ app.post("/post", uploadMiddleware.single("file"), async (req, res) => {
           title,
           summary,
           content,
-          cover: newPath,
+          cover: result.secure_url,
           author: info.id,
         });
 
@@ -122,14 +158,14 @@ app.post("/post", uploadMiddleware.single("file"), async (req, res) => {
     res.status(500).json({ error: "Failed to create post" });
   }
 });
+
 app.put("/post", uploadMiddleware.single("file"), async (req, res) => {
-  let newPath = null;
+  let newCoverUrl = null;
   if (req.file) {
-    const { originalname, path } = req.file;
-    const parts = originalname.split(".");
-    const ext = parts[parts.length - 1];
-    newPath = path + "." + ext;
-    fs.renameSync(path, newPath);
+    const result = await uploadOnCloudinary(req.file.path);
+    if (result) {
+      newCoverUrl = result.secure_url;
+    }
   }
 
   const { token } = req.cookies;
@@ -137,15 +173,20 @@ app.put("/post", uploadMiddleware.single("file"), async (req, res) => {
     if (err) throw err;
     const { id, title, summary, content } = req.body;
     const postDoc = await Post.findById(id);
-    console.log(postDoc);
     const isAuthor = JSON.stringify(postDoc.author) === JSON.stringify(info.id);
     if (!isAuthor) {
       return res.status(400).json("you are not the author");
     }
+
+    if (newCoverUrl && postDoc.cover) {
+      const publicId = postDoc.cover.split("/").pop().split(".")[0];
+      await deleteFromCloudinary(publicId);
+    }
+
     postDoc.title = title;
     postDoc.summary = summary;
     postDoc.content = content;
-    postDoc.cover = newPath ? newPath : postDoc.cover;
+    postDoc.cover = newCoverUrl ? newCoverUrl : postDoc.cover;
 
     await postDoc.save();
 
@@ -172,6 +213,7 @@ app.get("/post/:id", async (req, res) => {
   console.log(postDoc);
   res.json(postDoc);
 });
+
 app.delete("/post/:id", async (req, res) => {
   const { token } = req.cookies;
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, {}, async (err, info) => {
@@ -188,6 +230,11 @@ app.delete("/post/:id", async (req, res) => {
         JSON.stringify(postDoc.author) === JSON.stringify(info.id);
       if (!isAuthor) {
         return res.status(403).json({ error: "You are not the author" });
+      }
+
+      if (postDoc.cover) {
+        const publicId = postDoc.cover.split("/").pop().split(".")[0];
+        await deleteFromCloudinary(publicId);
       }
 
       await Post.findByIdAndDelete(id);

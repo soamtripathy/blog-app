@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 import parse from "html-react-parser";
 
 const Post = ({ _id, title, summary, cover, content, createdAt, author }) => {
-  console.log(author); // Debugging line to check the author prop
+  console.log(cover); // Debugging line to check the author prop
   return (
     <div className="post">
       <Link to={`/post/${_id}`}>
-        <img src={"http://localhost:8000/" + cover} alt={title} />
+        <img src={cover} alt={title} />
       </Link>
       <div className="texts">
         <Link to={`/post/${_id}`}>

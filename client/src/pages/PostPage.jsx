@@ -49,7 +49,7 @@ const PostPage = () => {
       )}
 
       <div className="image">
-        <img src={`http://localhost:8000/${postInfo.cover}`} alt="" />
+        <img src={postInfo.cover} alt="" />
       </div>
       <div
         className="content"
