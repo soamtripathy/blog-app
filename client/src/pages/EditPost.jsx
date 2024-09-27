@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 import Editor from "../components/Editor.jsx";
+import DeletePost from "./DeletePost.jsx";
 
 export default function EditPost() {
   const { id } = useParams();
@@ -61,6 +62,7 @@ export default function EditPost() {
       <input type="file" onChange={(ev) => setFiles(ev.target.files)} />
       <Editor onChange={setContent} value={content} />
       <button style={{ marginTop: "5px" }}>Update post</button>
+      <DeletePost style={{ marginTop: "20px" }} />
     </form>
   );
 }

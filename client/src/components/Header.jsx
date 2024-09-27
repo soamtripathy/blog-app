@@ -2,6 +2,7 @@ import { useContext, useEffect } from "react";
 import logoImage from "../../public/morsamiya.jpg";
 import { Link } from "react-router-dom";
 import { UserContext } from "../UserContext.jsx";
+import DarkMode from "./DarkMode.jsx";
 const Header = () => {
   const { setUserInfo, userInfo } = useContext(UserContext);
   useEffect(() => {
@@ -30,9 +31,10 @@ const Header = () => {
           <img src={logoImage} />
         </Link>
         <nav>
+          <DarkMode />
+
           {username && (
             <>
-              <span>Hello, {username}</span>
               <Link to="/create">Create new post</Link>
               <a onClick={logout} href="#">
                 Logout ({username})
