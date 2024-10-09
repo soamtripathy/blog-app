@@ -39,7 +39,12 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-app.use(cors({ credentials: true, origin: "https://blog-app-v1-soamtripathy.vercel.app" }));
+app.use(
+  cors({
+    credentials: true,
+    origin: "https://blog-app-v1-soamtripathy.vercel.app/",
+  })
+);
 
 app.use(
   express.json({
@@ -50,6 +55,13 @@ app.use(
 app.use(cookieParser());
 
 app.use("/uploads", express.static("uploads"));
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  next();
+});
 
 mongoose
   .connect(process.env.MONGODB_URI)
