@@ -8,7 +8,7 @@ const PostPage = () => {
   const { id } = useParams();
   const { userInfo } = useContext(UserContext);
   useEffect(() => {
-    fetch(`http://localhost:8000/post/${id}`)
+    fetch(`https://blog-app-server-cyan.vercel.app/post/${id}`)
       .then((response) => response.json())
       .then((postInfo) => {
         setPostInfo(postInfo);

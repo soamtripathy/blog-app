@@ -9,7 +9,7 @@ const DeletePost = () => {
 
   async function deletePost() {
     try {
-      const response = await fetch("http://localhost:8000/post/" + id, {
+      const response = await fetch("https://blog-app-server-cyan.vercel.app/post/" + id, {
         method: "DELETE",
         credentials: "include",
       });
