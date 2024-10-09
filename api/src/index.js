@@ -39,7 +39,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
+app.use(cors({ credentials: true, origin: "https://blog-app-v1-soamtripathy.vercel.app" }));
 
 app.use(
   express.json({
