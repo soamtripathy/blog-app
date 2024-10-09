@@ -15,7 +15,21 @@ import path from "path";
 
 const app = express();
 
-const uploadMiddleware = multer({ dest: "uploads/" });
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const path = "./public/temp";
+    if (!fs.existsSync(path)) {
+      fs.mkdirSync(path, { recursive: true });
+    }
+    return cb(null, path);
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+});
+
+// Create the multer instance
+const uploadMiddleware = multer({ storage: storage });
 
 dotenv.config({ path: "./.env" });
 
@@ -42,9 +56,9 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-app.get("/", (req, res)=> {
-  res.json("Hello")
-})
+app.get("/", (req, res) => {
+  res.json("Hello");
+});
 
 app.post("/register", async (req, res) => {
   try {
